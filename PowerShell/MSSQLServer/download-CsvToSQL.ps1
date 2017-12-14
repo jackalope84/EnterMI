@@ -32,7 +32,7 @@ Read a file from a website into the table
 download-CsvToSQL.ps1 -sqServer "SQL01" -database "migrate-data" -table "export" -url "http://localhost/data.csv" -file "c:\temp\file.csv"
 
 .LINK
-https://github.com/beakerflo/EnterMI
+https://www.entermi.nl
 #>
 [CmdletBinding()]
 param(
