@@ -50,13 +50,13 @@ If (Test-Path $file) {
 
 if (Get-Module -ListAvailable -Name SqlServer) {
     Write-Verbose "Importing SqlServer"
-    Import-Module "sqlps" -DisableNameChecking
+    Import-Module "SqlServer" -DisableNameChecking
 } elseif (Get-Module -ListAvailable -Name sqlps) {
     Write-Verbose "Importing sqlps"
     Import-Module "sqlps" -DisableNameChecking
 } else {
     Write-Host "Module does not exist"
-    Write-Host "This script needs 'SqlServer' or the older 'sqlps'"
+    Write-Host "This script needs 'SqlServer' or the older 'sqlps' module"
     Write-Host "Please install..."
     exit
 }
