@@ -17,6 +17,7 @@ DEST="/Users/floris/Downloads/done/"
 DEST_EXT=mp4
 HANDBRAKE_CLI=/Applications/HandBrakeCLI
 
+# walkthrough all files in folder and put them in the HandBrakeCLI
 for FILE in "$SRC"/*
 do
     filename=$(basename "$FILE")
