@@ -33,7 +33,7 @@ If you to mail the sheet, fill in an email body
 This is an optional parameter; if it is not included, an empty mail will be sent
 .EXAMPLE
 Read data from the SQL Server, save it in a file and mail it to floris@entermi.nl
-download-CsvToSQL.ps1 -sqServer "SQL01" -database "migrate-data" -table "export" -url "http://localhost/data.csv" -file "c:\temp\file.csv"
+download-CsvToSQL.ps1 -sqlServer "SQL01" -database "migrate-data" -table "export" -url "http://localhost/data.csv" -file "c:\temp\file.csv"
 .LINK
 https://github.com/beakerflo/EnterMI
 #>
