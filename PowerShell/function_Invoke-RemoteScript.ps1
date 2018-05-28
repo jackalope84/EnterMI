@@ -54,10 +54,10 @@ function Invoke-RemoteScript() {
         Write-Verbose "Connect with $computer"
         if(Test-Path Variable:\Credentials) {
             Write-Verbose "Connect with $credentials.Username"
-            Invoke-Command -ComputerName $Computer -FilePath $Scriptfile
+            Invoke-Command -ComputerName $Computer -FilePath $Scriptfile -Credential $credentials
         } else {
             Write-Verbose "Connect with Logged On User"
-            Invoke-Command -ComputerName $Computer -FilePath $Scriptfile -Credential $credentials
+            Invoke-Command -ComputerName $Computer -FilePath $Scriptfile
         }
     }
     Remove-Variable -Name Credentials
