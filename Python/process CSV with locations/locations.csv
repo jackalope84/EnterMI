@@ -1,0 +1,5 @@
+ID,lat,lon,ele,time,magvar,geoidheight,name,cmt,desc,src,sym,type,fix,sat,hdop,vdop,pdop,ageofdgpsdata,dgpsid,Proximity,Temperature,Depth,DisplayMode,Samples,Expiration,CreationTime,
+4,48.445844985544682,5.149391032755375,,2017-05-26T15:26:19Z,,,"Camperplaats Joinville",,,,"Campground","user",,,,,,,,,,,SymbolAndName,,,2017-05-26T15:26:19Z,
+5,44.531172411516309,6.430243654176593,784.69921875,2018-05-16T11:49:02Z,,,"Camperplek bij Crote",,,,"Campground","user",,,,,,,,,,,SymbolAndName,,,2018-05-16T11:49:02Z,
+6,49.790622694417834,5.047184955328703,,2018-05-01T11:47:57Z,,,"Camping Halliru",,,,"Campground","user",,,,,,,,,,,SymbolAndName,,,2018-05-01T11:47:57Z,
+7,48.404876003041863,5.270125977694988,,2017-05-10T19:34:29Z,,,"Camping La Forge",,,,"Campground","user",,,,,,,,,,,SymbolAndName,,,2017-05-10T19:34:29Z,
