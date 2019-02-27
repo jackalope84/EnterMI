@@ -24,7 +24,7 @@ $rebootTimeout = Get-Random -Maximum 120 -Minimum 10
 # exit script if no updates are found
  If ( $updates -eq $Null ) {
     Write-Host "No updates found."
-    break 
+    break
 }
 
 Write-Host "" # line break
@@ -33,7 +33,7 @@ Write-Host "Available Updates:"
 $updateNames = $updates | Select -ExpandProperty Name
 
 # display numbered list of update names
-foreach($updateName in $updateNames) {
+ForEach($updateName in $updateNames) {
     Write-Host $updateName
     }
 
@@ -46,9 +46,9 @@ $failedUpdates = @()
 
 # formats updates by just getting those that are required (ComplianceState=0). Converts updates to WMI so that they can be installed.
 ForEach ( $update in $updates ) {
-    $f_update = @($update | ForEach-Object {if($_.ComplianceState -eq 0){[WMI]$_.__PATH}})
+    $f_update = @($update | ForEach-Object { if($_.ComplianceState -eq 0){[WMI]$_.__PATH} })
     $installName = $update | Select Name
- 
+
     # Installs updates
     $uWmiOutput = ""
     $uWmiOutput = ([wmiclass]'ROOT\ccm\ClientSdk:CCM_SoftwareUpdatesManager').InstallUpdates($f_update)
@@ -69,9 +69,9 @@ ForEach ( $update in $updates ) {
     $eval_state = (Get-WmiObject -Class CCM_SoftwareUpdate -Namespace root\CCM\ClientSDK | Where -filterscript { $_.Name -like "*$f_install_name*" }).EvaluationState
 
     If ( $eval_state -eq "13") {
-        $failedUpdates += $f_install_name 
-    } Else { 
-        Write-Host "Success: $f_install_name" -foregroundcolor green
+        $failedUpdates += $f_install_name
+    } Else {
+        Write-Host "Success: $f_install_name" -ForegroundColor green
         $reboot = $True
     }
 }
@@ -80,7 +80,7 @@ If ( $failedUpdates -ne $Null ) {
     Write-Host ""
     Write-Host "Failed Updates:"
     ForEach ($failedUpdate in $failedUpdates) {
-        Write-Host $failedUpdate -foregroundcolor red 
+        Write-Host $failedUpdate -ForegroundColor red
     }
 }
 
@@ -100,6 +100,6 @@ If ( ($u_p_reboot -eq $True) -and ($reboot = $True) -and ($preventReboot = $Fals
     } ElseIf ( ($u_p_reboot -eq $True) -and ($reboot = $True) -and ($preventReboot = $True) ) {
     Write-Host "Reboot is Required."
     Write-Host "Please reboot!!!" -ForegroundColor Red
-} Else { 
-    Write-Host "Reboot not Required." 
+} Else {
+    Write-Host "Reboot not Required."
 }
