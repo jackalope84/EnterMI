@@ -1,4 +1,4 @@
-﻿function Invoke-CommandInRunspace { 
+﻿function Invoke-CommandAsync { 
 	<#
 	.SYNOPSIS
 	Invoke a command on multiple computers asynchronously
@@ -14,9 +14,14 @@
 	.PARAMETER Throttle
 	How many threads can run simultaniously
 	.EXAMPLE
-	Invoke-CommandInRunspace -Computername 'DC01','DC02','FILE01' -ScriptFile '.\testCopy.ps1'
+	Invoke-CommandAsync -Computername 'DC01','DC02','FILE01' -ScriptFile '.\testCopy.ps1'
+	Example with a file running on three servers simultanously
 	.EXAMPLE
-	Invoke-CommandInRunspace -Computername 'FILE01','SQL01','MAIL01' -ScriptBlock { Get-Process }
+	Invoke-CommandAsync -Computername 'FILE01','SQL01' -argumentlist 'notepad' -ScriptBlock { param($proc) Get-Process -Name $proc }
+	Example with a scriptblock with parameters running on two servers simultanously
+	.EXAMPLE
+	Invoke-CommandAsync -Computername (Get-Content .\computers.txt) -ScriptBlock { Get-Process }
+	Example with running a scriptblock on several machines in text file
 	.LINK
 	https://www.entermi.nl
 	.NOTES
@@ -38,6 +43,8 @@
 		[Parameter(Mandatory=$False,
 				   ValueFromPipeline=$False)]
 		[sring]$ScriptFile = $null,
+		[Parameter(Mandatory=$False, ValueFromPipeline=$False)]
+        $ArgumentList = $null,
 		[Parameter(Mandatory=$False,
 				   ValueFromPipeline=$True)]
 		[int]$Throttle = 20
@@ -45,7 +52,7 @@
 
 	$Stopwatch = New-Object System.Diagnostics.Stopwatch
     $Stopwatch.start()
-	Write-Verbose -Message "Begin Invoke-CommandInRunspace"
+	Write-Verbose -Message "Begin Invoke-CommandAsync"
 	
 	$RunspacePool = [runspacefactory]::CreateRunspacePool(1,$Throttle)
 	$RunspacePool.ApartmentState = "MTA"
@@ -55,15 +62,16 @@
 		Param(
 			[string] $Computer,
 			[scriptblock] $ScriptBlock = $null,
-			[string] $ScriptFile = $null
+			[string] $ScriptFile = $null,
+			$ArgumentList
 		)
 
 		if($ScriptBlock) {
 			Write-Verbose -Message "Run Invoke-Command on $Computer with scriptblock"
-			return (Invoke-Command -ComputerName $Computer -ScriptBlock $ScriptBlock)
+			return (Invoke-Command -ComputerName $Computer -ScriptBlock $ScriptBlock -ArgumentList (,$ArgumentList))
 		} elseif($ScriptFile) {
 			Write-Verbose -Message "Run Invoke-Command on $Computer with scriptfile; $ScriptFile"
-			return (Invoke-Command -ComputerName $Computer -FilePath $ScriptFile)
+			return (Invoke-Command -ComputerName $Computer -FilePath $ScriptFile -ArgumentList (,$ArgumentList))
 		} else {
 			return $null
 		}
@@ -75,7 +83,8 @@
         $ParamContainer = @{
             Computer = $Computer
             ScriptBlock = $ScriptBlock
-            ScriptFile = $ScriptFile
+			ScriptFile = $ScriptFile
+			ArgumentList = $ArgumentList
         }
 
 		$RunspaceObject = [PSCustomObject]@{
@@ -88,13 +97,18 @@
 		$RunspaceObject.Invoker = $RunspaceObject.Runspace.BeginInvoke()
 
 		$Threads += $RunspaceObject
-		Write-Verbose -Message "Finished creating runspace for $Computer. Elapsed time: $($Stopwatch.Elapsed)"
+		Write-Verbose -Message "Created runspace for $Computer. Elapsed time: $($Stopwatch.Elapsed)"
 	}
-	Write-Verbose -Message "Finished creating runspaces for all computers. Elapsed time: $($Stopwatch.Elapsed)"
+	Write-Verbose -Message "Created runspaces for all computers. Elapsed time: $($Stopwatch.Elapsed)"
 	
 	While ($Threads.Invoker.IsCompleted -contains $false) {
-		Write-Host "Waiting for all threads to complete"
-		Start-Sleep -Seconds 3
+        if($stopwatch.Elapsed.Minutes -eq $minutes) {
+            Write-Host "Waiting for all threads to complete"
+        } else {
+            Write-Host "Waiting for all threads to complete. Elapsed time: $($Stopwatch.Elapsed)"
+            $minutes = $stopwatch.Elapsed.Minutes
+        }
+        Start-Sleep -Seconds 3
 	}
 	Write-Host "All threads are completed, time elapsed: $($Stopwatch.Elapsed)"
 
@@ -106,5 +120,5 @@
 	$RunspacePool.Close()
 	$RunspacePool.Dispose()
 
-	Write-Verbose -Message "End Invoke-CommandInRunspace, time elapsed: $($Stopwatch.Elapsed)"
+	Write-Verbose -Message "End Invoke-CommandAsync, time elapsed: $($Stopwatch.Elapsed)"
 }
