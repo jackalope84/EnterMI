@@ -1,0 +1,36 @@
+
+$VmFolder = Get-View -ViewType Folder -Filter @{'Name' = 'VmFolderName' }
+
+$NewVmParams = @{
+    Name              = 'VmName'
+    Template          = 'VmTemplateName'
+    ResourcePool      = 'VIcenter'
+    Location          = $VmFolder.Name
+    DiskStorageFormat = "Thin"
+}
+
+$tplOsSpec = Get-OSCustomizationSpec -Name 'Naam van OSCustomization Spec'
+$cloneOsSpec = New-OSCustomizationSpec -Name "AMPDeploy-VMnaam" -OSCustomizationSpec $tplOsSpec -Type Persistent
+$cloneOsSpec = Set-OSCustomizationSpec -OSCustomizationSpec $cloneOsSpec -AdminPassword 'AdminPassword'
+
+$NewVmParams.Add("OSCustomizationSpec", $cloneOsSpec)
+$NewVmParams.Add("Datastore", 'Datastore.Name')
+
+New-VM @NewVmParams -RunAsync
+
+$VmCreated = Get-View -ViewType VirtualMachine -Filter @{'Name' = 'vmNaam' }
+
+$spec = New-Object VMware.Vim.VirtualMachineConfigSpec
+
+$dev = New-Object VMware.Vim.ResourceAllocationInfo
+$dev.reservation = '1024'
+$spec.cpuAllocation = $dev
+
+$spec.NumCPUs(2)
+$spec.NumCoresPerSocket(4)
+$spec.MemoryMB(512000)
+$VmCreated.setCustomValue('Functie', 'Functie van de VM')
+$VmCreated.setCustomValue('Klant', 'Klantnaam')
+$VmCreated.setCustomValue('Notitie', 'Meer opmerkingen over de VM')
+$VmCreated.ReconfigVM($spec)
+$VmCreated.PowerOnVM($null)
